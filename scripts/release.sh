@@ -4,7 +4,7 @@
 #   scripts/release.sh <service>              build, load, bump the tag in the local overlay (no commit)
 #   scripts/release.sh <service> --load-only  build and load the tag already pinned in Git (used by make up)
 #   scripts/release.sh <service> --commit     also commit the tag bump
-#   scripts/release.sh <service> --push       commit and push (uses the gh credential helper, no git config change)
+#   scripts/release.sh <service> --push       commit and push HEAD to the branch ArgoCD tracks (main, or $DEPLOY_BRANCH)
 #
 # The tag is the short SHA of the last commit that touched services/<service>: immutable, never re-pushed.
 # Order is enforced: build, load, confirm the image in the cluster, only then change Git.
@@ -54,5 +54,6 @@ if [ "$MODE" = "--commit" ] || [ "$MODE" = "--push" ]; then
   git commit -m "deploy($SERVICE): $TAG"
 fi
 if [ "$MODE" = "--push" ]; then
-  git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin HEAD
+  # ArgoCD tracks main: push there (override with DEPLOY_BRANCH). Uses the gh credential helper, no git config change.
+  git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin "HEAD:${DEPLOY_BRANCH:-main}"
 fi
