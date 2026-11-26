@@ -7,3 +7,5 @@ Micro Service
 
 Architecture :
 Analyse Fonctionnelle : doc/spec/B2-5095/spec.md
+
+Version pinned in Git through `make release` (SC-012 live check).
