@@ -9,6 +9,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import com.videotron.bsi.service.a.exception.BsiException;
@@ -21,6 +22,7 @@ import io.vertx.core.http.HttpClosedException;
  *
  * @ref doc/spec/B2-5095/spec.md, Error Management and spec v0.8 (refused connection -> SERVICE_B_UNAVAILABLE)
  */
+@QuarkusTest
 class BsiExceptionFunctionTest {
 
     private static final String BACKEND = "service-b";

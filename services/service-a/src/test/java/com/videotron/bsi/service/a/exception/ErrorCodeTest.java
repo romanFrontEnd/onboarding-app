@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.ws.rs.core.Response.Status;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  *
  * @ref doc/spec/B2-5095/spec.md, Error Management (spec v0.8: service-b 4xx and 5xx map to 502 SERVICE_B_ERROR)
  */
+@QuarkusTest
 class ErrorCodeTest {
 
     @ParameterizedTest

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import com.videotron.bsi.service.a.client.serviceb.ServiceBExceptionMapper;
@@ -24,6 +25,7 @@ import com.videotron.bsi.service.a.resources.ErrorRepresentation;
  *
  * @ref doc/spec/B2-5095/spec.md, Error Management (service-b 4xx and 5xx answers map to 502 SERVICE_B_ERROR)
  */
+@QuarkusTest
 class AbstractBackendExceptionMapperTest {
 
     private final ServiceBExceptionMapper normalizing = new ServiceBExceptionMapper();
