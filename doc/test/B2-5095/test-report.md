@@ -93,19 +93,19 @@ Classes still at 0% lines: service-a `CombinedException`, `CombinedExceptionHand
 | @SC-004 | service-a-combined: Service-b refuses the connection | service-a CucumberRunnerTest, BsiExceptionFunctionTest | PASSED | conforming |
 | @SC-005 | service-a-combined: Service-b returns a server error and service-a does not retry | service-a CucumberRunnerTest, AbstractBackendExceptionMapperTest | PASSED | conforming |
 | @SC-006 | service-a-combined: Service-a retries timeouts up to the configured count | service-a CucumberRunnerTest | PASSED | conforming |
-| @SC-007 | service-a-combined: The transaction ID from the request is passed to service-b | service-a CucumberRunnerTest | PASSED | partial, see finding 3 |
+| @SC-007 | service-a-combined: The transaction ID from the request is passed to service-b | service-a CucumberRunnerTest; live run 2026-11-25 | PASSED | conforming (live: ID `live-001` found in the logs of both pods) |
 | @SC-008 | service-a-combined: Name length boundary (3 rows) | service-a CucumberRunnerTest, NameValidatorTest | PASSED | conforming |
 | @SC-009 | service-a-combined: Readiness of service-a does not depend on service-b | service-a CucumberRunnerTest | PASSED | conforming (baseline) |
 | @SC-010 | service-b-hello: Greeting for a valid name | service-b CucumberRunnerTest, HelloServiceTest | PASSED | conforming |
 | @SC-011 | service-b-hello: Health endpoints answer (2 rows) | service-b CucumberRunnerTest | PASSED | conforming (baseline) |
-| @SC-012 | deployment-gitops: A new version is deployed only through a Git change | none in the Java suite | not run | not-covered, see finding 4 |
-| @SC-013 | deployment-gitops: A tag is never committed before its image is in the cluster | none in the Java suite | not run | not-covered, see finding 4 |
-| @SC-014 | deployment-gitops: A clean cluster reaches Synced and Healthy | none in the Java suite | not run | not-covered, see finding 4 |
-| @SC-015 | deployment-gitops: The example overlay differs from the base | none in the Java suite | not run | not-covered, see finding 4 |
+| @SC-012 | deployment-gitops: A new version is deployed only through a Git change | live run: `release.sh service-b --push` (tag `9c088b9`) | PASSED | conforming (ArgoCD rolled service-b from `b5e3eda` to `9c088b9`, Synced and Healthy, no mutable tag) |
+| @SC-013 | deployment-gitops: A tag is never committed before its image is in the cluster | live run: `release.sh` with a failing `minikube image load` | PASSED | conforming (exit 1, HEAD and overlay tag unchanged) |
+| @SC-014 | deployment-gitops: A clean cluster reaches Synced and Healthy | live run: `make up` on a new minikube profile | PASSED | conforming (root, service-a, service-b Synced and Healthy, all pods 1/1) |
+| @SC-015 | deployment-gitops: The example overlay differs from the base | live run: `kubectl kustomize` diff local vs example | PASSED | conforming (replicas 1 to 2, `QUARKUS_LOG_LEVEL`, service-a timeout 2000 to 3000, other namespace) |
 | @SC-016 | service-a-combined: Service-a recovers when service-b answers on a retry | service-a CucumberRunnerTest | PASSED | conforming |
 | @SC-017 | service-a-combined: The response time is bounded when service-b is down | service-a CucumberRunnerTest | PASSED | conforming |
-| @SC-018 | service-a-combined: A transaction ID is generated when the request has none | service-a CucumberRunnerTest | PASSED | partial, see finding 3 |
-| @SC-019 | service-a-combined: Service-b is scaled to zero in the cluster | excluded by `@Cluster` | not run | not-covered, see finding 4 |
+| @SC-018 | service-a-combined: A transaction ID is generated when the request has none | service-a CucumberRunnerTest; live run 2026-11-25 | PASSED | conforming (live: response carried a generated `X-Transaction-Id`) |
+| @SC-019 | service-a-combined: Service-b is scaled to zero in the cluster | live run: `kubectl scale deploy/service-b --replicas=0` | PASSED | conforming (503 `SERVICE_B_UNAVAILABLE` in 0.48 s, service-a readiness stayed 200), see finding 6 |
 | @SC-020 | service-a-combined: Service-b returns a client error and service-a does not retry | service-a CucumberRunnerTest | PASSED | conforming |
 | @SC-021 | service-b-hello: Missing name is rejected | service-b CucumberRunnerTest | PASSED | conforming (added with spec v0.10) |
 | @SC-022 | service-b-hello: Name length boundary (3 rows) | service-b CucumberRunnerTest | PASSED | conforming (added with spec v0.10) |
@@ -116,13 +116,17 @@ Classes still at 0% lines: service-a `CombinedException`, `CombinedExceptionHand
 |---|---------|----------|-----------|
 | 1 | service-b answered `200 "Hello, null"` for a missing or empty `name`, while the OpenAPI contract declares a 400. The spec did not define service-b's validation. | Built jar, `GET /api/v1/hello` and `?name=` both returned 200. SC-021 and SC-022 (51 characters) failed RED before the fix. | Spec defined in v0.10 by the Developer (Mandy's role), fixed by Cody with Bean Validation on the query parameter, now GREEN. **Closed.** |
 | 2 | Alfie's template infrastructure is unused or unreachable: service-a `ResteasyReactiveViolationExceptionMapper` (no Bean Validation constraint can trigger it, 0%), the legacy exception handlers `CombinedExceptionHandler`, `HelloExceptionHandler`, `GenericExceptionHandler` and exceptions `CombinedException`, `HelloException` (nothing throws them now), and the RELAY path of `BsiExceptionMapper` (service-a uses NORMALIZE). | JaCoCo report, 0% or 58% lines | Developer decision: keep (the approved plan's choice) or remove. Not actioned. Removal would go to Cody. |
-| 3 | SC-007 and SC-018 prove service-a's logs and the header service-b receives. Service-b's own log line carrying the same transaction ID cannot be seen from service-a's tests. | `CombinedSteps` step "the logs of service-a and service-b both contain" | Cluster run (live minikube) |
-| 4 | SC-012 to SC-015 (GitOps deployment) and SC-019 (service-b scaled to 0) are not covered: they need the minikube cluster, ArgoCD and the release script, which do not exist yet. | `deploy/features/deployment-gitops.feature`, `@Cluster` tag | Confy and the bootstrap scripts, then a live verification run |
+| 3 | SC-007 and SC-018 were only partly provable in the Java suite (service-b's own logs are not visible there). | Live run: transaction ID `live-001` appears in 6 log lines of service-a and 5 of service-b | **Closed** by the live run |
+| 4 | SC-012 to SC-015 and SC-019 needed the live environment. | Live run of 2026-11-25 on minikube profile `onboarding` | **Closed**, see section 4 |
 | 5 | The retry backoff was undefined in the spec when SC-017 was written. Closed in spec v0.9 (200 ms fixed). | spec v0.9 | **Closed.** |
+| 6 | ArgoCD `selfHeal: true` reverts a manual `kubectl scale ... --replicas=0` within seconds, so the "service-b at 0" state used for AC3 is transient. The 503 was observed during that window (no ready endpoint, connection refused). | Live run: replicas back to 1 about 6 s after the scale | Developer decision: keep (GitOps-correct) or pause auto-sync on `service-b` for a longer demo. No change made. |
+| 7 | `release.sh --push` pushed `HEAD` to a branch of the same name, but ArgoCD tracks `main`, so a release never reached the cluster. | Found while preparing the live check | Fixed in Confys Local's template (push to `$DEPLOY_BRANCH`, default `main`) and re-rendered. **Closed.** |
 
 ## 6. Remaining gaps
 
-- The live environment is not verified: AC3 (scaling service-b to 0 in the cluster), AC4, AC5, AC6 overlay rendering, AC9 (clean-machine bootstrap) and AC10 are covered by scenarios SC-012 to SC-015 and SC-019, which have not run.
+- The live run used the author's own machine (Apple Silicon, minikube Docker driver). A second engineer reproducing it from the README alone (AC9) has not happened, and the root README of the repo is not written yet.
+- AC10 (private-repo credentials) is not exercised: the repo is public, so ArgoCD needs none.
+- The `example` overlay is rendered and diffed but was not deployed.
 - Finding 2 is an accepted risk until the Developer decides: about 90 lines of template infrastructure in each service have no behaviour to test.
 - `LoggingUtils` and the logging interceptors stay at low coverage (17% to 73%). They are Alfie's templates and the spec states no requirement on them.
 - SC-007 and SC-018 are proven only to the extent finding 3 describes.
@@ -133,3 +137,4 @@ Classes still at 0% lines: service-a `CombinedException`, `CombinedExceptionHand
 | Date | Commit | Suite result | Coverage (scope) | Report change |
 |------|--------|--------------|------------------|---------------|
 | 2026-11-25 | b5e3eda | GREEN, 75/75 (service-a 57, service-b 18) | service-a 71% lines, service-b 64% lines (all instrumented classes) | initial report |
+| 2026-11-25 | 1fa4c2c | Java suite unchanged (75/75). Live run: SC-012 to SC-015 and SC-019 PASSED, SC-007 and SC-018 confirmed live | not re-measured | live verification on minikube, findings 3 and 4 closed, findings 6 and 7 added |
