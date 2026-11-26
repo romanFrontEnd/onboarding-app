@@ -20,6 +20,8 @@ import com.videotron.bsi.service.b.service.HelloService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -44,8 +46,11 @@ public class HelloRestController {
     /**
      * Greeting for a name.
      *
-     * @param name the name to greet (required)
+     * @param name the name to greet (required, non-blank, at most 50 characters; a violation is mapped
+     *        to 400 INVALID_REQUEST by the Bean Validation violation mapper)
      * @return the greeting with status 200
+     * @traced CucumberRunnerTest SC-021, SC-022
+     * @ref doc/spec/B2-5095/spec.md v0.10, service-b validation
      */
     @GET
     @RunOnVirtualThread
@@ -56,7 +61,7 @@ public class HelloRestController {
         @Valid
         @BeanParam
         HeaderParameter headerParameter,
-        @QueryParam("name") String name) {
+        @QueryParam("name") @NotBlank @Size(max = 50) String name) {
 
         log.info("Start getHello for xTransactionId:%s".formatted(headerParameter.getXTransactionId()));
 

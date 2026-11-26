@@ -14,6 +14,7 @@ approvals:
 |  Version |   Date   | Change Description | Project/Feature | Author | Squad |
 |----------|----------|--------------------|-----------------|--------|-------|
 | 0.6 | 2026-11-25 | Spike evidence: image delivery High, ArgoCD pinned, AC coverage matrix added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
+| 0.10 | 2026-11-25 | service-b validation defined (finding F1 of Teddy's verification pass): `name` required, non-blank, at most 50 characters, otherwise 400 `INVALID_REQUEST`. Scenarios SC-021 and SC-022 added. Closed by the Developer | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.9 | 2026-11-25 | Retry backoff defined: fixed delay `SERVICE_B_RETRY_BACKOFF` (milliseconds, default 200) between attempts. Worst-case latency formula updated. Closed by the Developer after Teddy's RED run | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.8 | 2026-11-25 | Three gaps found while generating the shell, closed by the Developer: B 4xx answers map to 502 SERVICE_B_ERROR, a refused connection is classified as SERVICE_B_UNAVAILABLE in the shell, service-a block defined (`service`, `version`). Scenarios SC-001 updated and SC-020 added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.7 | 2026-11-25 | Retry rule defined (timeouts and connection errors only, never 4xx/5xx), timeout and retries made configuration, worst-case latency documented. Decided by the Developer while reviewing the Gherkin scenarios | Onboarding 26-Pi3/Pi4 | Roman | n/a |
@@ -91,6 +92,8 @@ Health endpoints are `/q/health/live` and `/q/health/ready`. The readiness of A 
 4. A retries only on timeouts and connection errors. It never retries on a 4xx or 5xx answer from B.
 5. A builds the combined response.
 
+**service-b validation (spec v0.10):** B applies the same rule to its own `name` parameter: required, non-blank, at most 50 characters. Otherwise B returns 400 `INVALID_REQUEST` (error payload as below). Before v0.10 B answered `200 {"message":"Hello, null"}` for a missing name.
+
 Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_TIMEOUT` + `SERVICE_B_RETRIES` x `SERVICE_B_RETRY_BACKOFF`, about 6.4s with the defaults.
 
 ## Mapping and Transformation Rules
@@ -116,6 +119,7 @@ Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_
 | timeout or connection refused | 503 | Service Unavailable | n/a | `SERVICE_B_UNAVAILABLE` | B slow or scaled to 0 |
 | 5xx | 502 | Bad Gateway | n/a | `SERVICE_B_ERROR` | B failed |
 | 4xx | 502 | Bad Gateway | n/a | `SERVICE_B_ERROR` | Unexpected answer from B: A validates the name first, so a 4xx from B is a contract mismatch. Not retried |
+| n/a (service-b itself) | 400 | Bad Request | n/a | `INVALID_REQUEST` | service-b received a missing, blank or over-long `name` (spec v0.10) |
 | n/a | 400 | Bad Request | n/a | `INVALID_REQUEST` | Missing or invalid `name` |
 
 **Example of an error payload**

@@ -20,6 +20,17 @@ public class HelloSteps {
         result.log().all();
     }
 
+    @When("I send GET {string} to service-b with a name of {int} characters")
+    public void i_send_get_with_name_of_length(String path, int length) {
+        result = given().queryParam("name", "a".repeat(length)).when().get(path).then();
+        result.log().all();
+    }
+
+    @Then("the error code is {string}")
+    public void the_error_code_is(String expectedCode) {
+        assertEquals(expectedCode, result.extract().jsonPath().getString("code"));
+    }
+
     @Then("the response status is {int}")
     public void the_response_status_is(int expectedStatus) {
         result.statusCode(expectedStatus);
