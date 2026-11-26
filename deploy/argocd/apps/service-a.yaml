@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: service-a
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/romanFrontEnd/onboarding-app.git
+    targetRevision: main
+    path: deploy/overlays/local/service-a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: onboarding
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

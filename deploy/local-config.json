@@ -1,0 +1,43 @@
+{
+  "namespace": "onboarding",
+  "exampleNamespace": "onboarding-example",
+  "profile": "onboarding",
+  "repoUrl": "https://github.com/romanFrontEnd/onboarding-app.git",
+  "revision": "main",
+  "argocdVersion": "v3.6.3",
+  "cpus": 3,
+  "memory": "4g",
+  "services": [
+    {
+      "name": "service-b",
+      "port": 8080,
+      "env": {
+        "QUARKUS_OTEL_SDK_DISABLED": "true"
+      },
+      "example": {
+        "replicas": 2,
+        "env": {
+          "QUARKUS_LOG_LEVEL": "DEBUG"
+        }
+      }
+    },
+    {
+      "name": "service-a",
+      "port": 8080,
+      "env": {
+        "SERVICE_B_URL": "http://service-b",
+        "SERVICE_B_TIMEOUT": "2000",
+        "SERVICE_B_RETRIES": "2",
+        "SERVICE_B_RETRY_BACKOFF": "200",
+        "QUARKUS_OTEL_SDK_DISABLED": "true"
+      },
+      "example": {
+        "replicas": 2,
+        "env": {
+          "SERVICE_B_TIMEOUT": "3000",
+          "QUARKUS_LOG_LEVEL": "DEBUG"
+        }
+      }
+    }
+  ]
+}
