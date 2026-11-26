@@ -1,5 +1,7 @@
 package com.videotron.bsi.service.a.client.serviceb;
 
+import static com.videotron.bsi.service.a.constants.Dictionary.X_TRANSACTION_ID;
+
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -7,6 +9,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import com.videotron.bsi.service.a.resources.HelloResponse;
 
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -28,5 +31,5 @@ public interface ServiceBClient {
     @GET
     @Path("/hello")
     @Produces(MediaType.APPLICATION_JSON)
-    HelloResponse getHello(@QueryParam("name") String name);
+    HelloResponse getHello(@QueryParam("name") String name, @HeaderParam(X_TRANSACTION_ID) String transactionId);
 }

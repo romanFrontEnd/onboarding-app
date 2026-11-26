@@ -5,7 +5,7 @@ intent_ref: none
 status: approved
 approvals:
   developer: Roman Gluschuk (2026-11-25, spec-approved gate)
-  analyst: pending
+  analyst: Roman Test (named 2026-11-25, approval pending)
 ---
 
 # MS service-a + service-b - Two Quarkus services on local minikube via ArgoCD: Functional Analysis
@@ -22,11 +22,11 @@ approvals:
 
 | Information Gap | Impact on Analysis | Resolution Status |
 |-----------------|-------------------|-------------------|
-| Repo name and visibility | ArgoCD `repoURL`, AC10 | Assumed `romanFrontEnd/onboarding-app`, public (name verified free). [NEEDS VERIFICATION] |
+| Repo name and visibility | ArgoCD `repoURL`, AC10 | Closed: `romanFrontEnd/onboarding-app`, public, confirmed by the Developer 2026-11-25. The repo does not exist on GitHub yet |
 | Retry and timeout default values | AC3 | Defaults 2s timeout and 2 retries, confidence Low. Now configuration (`SERVICE_B_TIMEOUT`, `SERVICE_B_RETRIES`), so changing them needs no spec change. |
 | End-to-end tag-bump flow on our own repo | AC4/AC5 | Verified in pieces by the spike. Final proof on first build. |
 | Intent artifact `doc/intent/B2-5095` | Spec cannot trace to an accepted intent | Open, a process item |
-| Analyst name for dual approval | SDLC & PRACTICES, phase 2 | Open |
+| Analyst name for dual approval | SDLC & PRACTICES, phase 2 | Closed: Roman Test. Analyst approval itself still pending |
 | Ingress | Not needed | Out of scope per the ticket |
 
 ## Pending Issues
@@ -172,18 +172,18 @@ Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_
 | Image delivery | `minikube image load`, git-SHA tags, `imagePullPolicy: Never` | High (spike-verified, negative and positive tests) | None |
 | ArgoCD from GitHub | ArgoCD syncs from GitHub on arm64 minikube | High (spike-verified) | None |
 | Layout | Monorepo: `services/`, `deploy/{base,overlays}`, `deploy/argocd`, `scripts/`, `docs/adr`. Differs from the BSI separate-config-repo convention | High (flagged) | None |
-| GitOps source | GitHub, public, `onboarding-app` | Medium (access verified) | Confirm name and visibility |
+| GitOps source | GitHub, public, `onboarding-app` | High (access verified, name and visibility confirmed) | None |
 | Build order | Alfie, Teddy (RED tests first), Cody, Confy (SDLC & PRACTICES, phase 6) | High | None |
-| Dual approval | Analyst and Developer approval noted in the Jira task (SDLC & PRACTICES, phase 2) | High | Analyst name |
+| Dual approval | Analyst (Roman Test) and Developer approval noted in the Jira task (SDLC & PRACTICES, phase 2) | High | Analyst approval |
 | Not applicable | SDLC phases 8-13, Connection Checker, TIGLIV/TBP via Trixie (WM-migration and real-environment steps only) | High | None |
 | JDK | Zulu 21 via `JAVA_HOME`, shell default is 17 | High | None |
 | Resilience defaults | 2s timeout, 2 retries, configurable. Retry only on timeouts and connection errors | Low (values), High (retry rule, decided by the Developer) | Confirm values |
 
 ## Open Questions
 
-1. Confirm repo name `onboarding-app` and public visibility.
+1. ~~Confirm repo name `onboarding-app` and public visibility.~~ Confirmed.
 2. Keep timeout 2s and 2 retries?
-3. Who is the Analyst for the dual approval?
+3. ~~Who is the Analyst for the dual approval?~~ Roman Test. Analyst approval is still to be given.
 
 ## Acceptance Criteria Coverage
 

@@ -35,6 +35,7 @@ import lombok.AccessLevel;
     /**
      * Backend names and processes.
      */
+    public static final String SERVICE_A = "service-a";
     public static final String SERVICE_B = "service-b";
 
     /**

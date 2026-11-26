@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.videotron.bsi.service.a.exception.BsiException;
 import com.videotron.bsi.service.a.exception.ErrorCode;
@@ -45,6 +46,10 @@ public final class BsiExceptionFunction {
             return new BsiException(ErrorCode.GENERIC_ERROR, failure, failure.getClass().getSimpleName());
         };
     }
+
+    /** Invalid request (name missing or invalid) -> BAD_REQUEST. */
+    public static final Supplier<BsiException> specifyInvalidRequest =
+            () -> new BsiException(ErrorCode.BAD_REQUEST);
 
     /** Unreadable backend body -> PROCESSING_ERROR, cause preserved. */
     public static final Function<Throwable, BsiException> specifyReadingFailure =

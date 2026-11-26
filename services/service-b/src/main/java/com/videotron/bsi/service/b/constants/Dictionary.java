@@ -20,6 +20,12 @@ public final class Dictionary {
     public static final String ERROR_TYPE = "ErrorRepresentation";
 
     /**
+     * Greeting.
+     */
+    public static final String SERVICE_NAME = "service-b";
+    public static final String GREETING = "Hello, %s";
+
+    /**
      * Metric names.
      */
     public static final String HELLO_OBSERVED = "service-b.hello";
