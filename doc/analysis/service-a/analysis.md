@@ -6,6 +6,7 @@ Whole-service analysis for `service-a`. It accumulates the development of the se
 | Version | Date | Change Description | Change | Author |
 |---------|------|--------------------|--------|--------|
 | 0.1 | 2026-11-25 | Initial analysis from B2-5095 | B2-5095 | Roman |
+| 0.2 | 2026-11-25 | B 4xx mapping, refused connection, service-a block (spec v0.8) | B2-5095 | Roman |
 
 ## Service Information
 
@@ -20,7 +21,8 @@ Called by a developer or test client after `make up`, through `kubectl port-forw
 - Calls `service-b` at `SERVICE_B_URL` with `SERVICE_B_TIMEOUT` (default 2s) and `SERVICE_B_RETRIES` (default 2) with backoff (Low confidence on the defaults, to confirm). Retries only on timeouts and connection errors, never on 4xx or 5xx.
 - Worst-case response time when B is down: (retries + 1) x timeout plus backoff.
 - Propagates `X-Transaction-Id` to B and logs it, generating one if absent.
-- Returns 503 `SERVICE_B_UNAVAILABLE` on timeout or connection failure, and 502 `SERVICE_B_ERROR` on a B 5xx.
+- Returns 503 `SERVICE_B_UNAVAILABLE` on timeout or connection failure (including a refused connection), and 502 `SERVICE_B_ERROR` on any B 4xx or 5xx answer (a 4xx means a contract mismatch, never retried).
+- The response carries its own `service-a` block (`service`, `version`) next to the `service-b` block.
 - Readiness does not depend on B. Liveness and readiness are on `/q/health/live` and `/q/health/ready`.
 
 ### Backend

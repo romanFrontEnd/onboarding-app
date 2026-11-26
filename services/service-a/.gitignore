@@ -1,0 +1,35 @@
+### Never ignore those files ###
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+# IntelliJ
+.idea/
+*.ipr
+*.iml
+*.iws
+
+### ECLIPSE ###
+.factorypath
+.mvn
+.settings
+target/
+.classpath
+.project
+.dockerignore
+mvnw
+mvnw.cmd
+bin/
+HELP.md
+.sts4-cache/
+
+### JMETER ###
+**/src/test/resources/nfr/report/**
+**/src/test/resources/nfr/jmeter.log
+**/src/test/resources/nfr/log.jtl
+
+### VSC ###
+.vscode/
+
+# Backups created by create_structure.py
+*.bak

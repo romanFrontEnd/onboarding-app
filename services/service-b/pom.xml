@@ -1,0 +1,365 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.videotron.bsi</groupId>
+    <artifactId>service-b</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>service-b</name>
+
+    <properties>
+        <compiler-plugin.version>3.15.0</compiler-plugin.version>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Quarkus platform pinned to the 3.40 LTS train — do not bump past 3.40.x here -->
+        <quarkus-plugin.version>3.40.1.1</quarkus-plugin.version>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+        <quarkus.platform.version>3.40.1.1</quarkus.platform.version>
+        <surefire-plugin.version>3.5.6</surefire-plugin.version>
+        <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+        <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+        <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+        <maven-site-plugin.version>3.22.0</maven-site-plugin.version>
+        <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+        <sonar.jacoco.reportPath>target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.reportsPath>target</sonar.jacoco.reportsPath>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.verbose>true</sonar.verbose>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.48</lombok.version>
+        <openapi-generator.version>7.24.0</openapi-generator.version>
+        <build-helper-plugin.version>3.6.1</build-helper-plugin.version>
+        <jacoco.version>0.8.15</jacoco.version>
+		<quarkus-wiremock.version>1.6.3</quarkus-wiremock.version>
+		<quarkus-cucumber.version>1.3.0</quarkus-cucumber.version>
+    </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>libs-snapshots-local</id>
+            <name>Nexus Snapshots Repo</name>
+            <url>${nexus.snapshot.url}</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>libs-releases-local</id>
+            <name>Nexus Releases Repo</name>
+            <url>${nexus.release.url}</url>
+        </repository>
+    </distributionManagement>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Quarkus Core Dependencies -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+        </dependency>
+
+		<!-- Quarkus rest client Dependencies -->
+        <dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client-jackson</artifactId>
+		</dependency>
+
+        <!-- Jackson Dependencies (versions managed by quarkus-bom — do NOT pin explicitly) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.9</version>
+        </dependency>
+
+        <!-- Documentation and API -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+
+        <!-- Observability -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-opentelemetry</artifactId>
+        </dependency>
+		<dependency>
+		    <groupId>io.quarkus</groupId>
+		    <artifactId>quarkus-micrometer-opentelemetry</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Validation -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- MapStruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vavr</groupId>
+			<artifactId>vavr</artifactId>
+			<version>0.10.4</version>
+		</dependency>
+
+        <!-- Logging -->
+		<dependency>
+			<groupId>io.quarkiverse.loggingjson</groupId>
+			<artifactId>quarkus-logging-json</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+	        <groupId>io.quarkiverse.wiremock</groupId>
+	        <artifactId>quarkus-wiremock</artifactId>
+	        <version>${quarkus-wiremock.version}</version>
+	        <scope>provided</scope>
+	    </dependency>
+	    <dependency>
+	        <groupId>io.quarkiverse.wiremock</groupId>
+	        <artifactId>quarkus-wiremock-test</artifactId>
+	        <version>${quarkus-wiremock.version}</version>
+	        <scope>test</scope>
+	    </dependency>
+		<dependency>
+		    <groupId>io.quarkiverse.cucumber</groupId>
+		    <artifactId>quarkus-cucumber</artifactId>
+		    <version>${quarkus-cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+              <groupId>io.quarkus</groupId>
+        	  <artifactId>quarkus-jacoco</artifactId>
+       		  <scope>test</scope>
+    	</dependency>
+
+        <!-- Database Dependencies -->
+        <!-- Database dependencies - Uncomment when connecting to relational databases -->
+        <!--
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-agroal</artifactId>
+        </dependency>
+        -->
+        <!--
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-oracle</artifactId>
+        </dependency>
+        -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Quarkus Maven Plugin -->
+            <plugin>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+							<goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <maven.home>${maven.home}</maven.home>
+                        <maven.settings>${session.request.userSettingsFile.path}</maven.settings>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+            </plugin>
+
+            <!-- OpenAPI Generator Plugin -->
+            <!--
+                IMPORTANT - DEVELOPER WORKFLOW FOR MODIFYING GENERATED CLASSES:
+
+                The plugin generates model classes in target/generated-sources, which are
+                regenerated on every clean build. To modify these classes without losing changes:
+
+                1. First generate the models initially: mvn clean compile
+                2. Copy generated classes to source tree:
+                   python create_service_structure_template.py copy-openapi-classes -s SERVICE_NAME -b .
+                3. Modify the classes in src/main/java/com/videotron/bsi/SERVICE_NAME/resources/
+                4. Your modifications will be preserved during builds because classes in src/main/java
+                   take precedence over the auto-generated ones in the classpath
+            -->
+
+            <!-- Build Helper Maven Plugin - Add generated sources to build -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/api/src/gen/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- No additional plugins needed for file renaming -->
+            <!-- OpenAPI Generator handles naming with apiNameSuffix parameter -->
+
+            <!-- Compiler Plugin with MapStruct and Lombok processors -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+		<profile>
+			<id>native</id>
+			<activation>
+				<property>
+					<name>native</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${surefire-plugin.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<systemPropertyVariables>
+										<native.image.path>${project.build.directory}/${project.build.finalName}-runner
+										</native.image.path>
+										<java.util.logging.manager>org.jboss.logmanager.LogManager
+										</java.util.logging.manager>
+										<maven.home>${maven.home}</maven.home>
+									</systemPropertyVariables>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<properties>
+				<quarkus.package.type>native</quarkus.package.type>
+			</properties>
+		</profile>
+	</profiles>
+</project>

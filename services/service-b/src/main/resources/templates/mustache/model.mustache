@@ -1,0 +1,94 @@
+{{#models}}
+{{#model}}
+{{#isEnum}}
+{{> enumClass}}
+{{/isEnum}}
+{{^isEnum}}
+{{#isArrayModel}}
+{{> arrayModel}}
+{{/isArrayModel}}
+{{^isArrayModel}}
+{{#isMapModel}}
+    {{> mapModel}}
+{{/isMapModel}}
+{{^isMapModel}}
+
+package {{modelPackage}};
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.*;
+import java.util.List;
+import java.time.OffsetDateTime;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Date;
+{{#hasEnums}}
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+{{/hasEnums}}
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@RegisterForReflection
+@SuppressWarnings("unused")
+public class {{classname}} {
+{{#parentModel}}
+    // Properties from parent model are included directly
+{{/parentModel}}
+
+    {{#vars}}
+    {{#isEnum}}
+    /**
+     * {{dataType}} enum values
+     */
+    public enum {{enumName}} {
+        {{#allowableValues}}
+        {{#enumVars}}
+        {{#isString}}
+        @JsonProperty({{{value}}})
+        {{name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+        {{/isString}}
+        {{^isString}}
+        @JsonProperty("{{value}}")
+        {{name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+        {{/isString}}
+        {{/enumVars}}
+        {{/allowableValues}}
+
+        private final {{{dataType}}} value;
+
+        {{enumName}}({{{dataType}}} value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public {{{dataType}}} getValue() {
+            return value;
+        }
+
+        @JsonCreator
+        public static {{enumName}} fromValue({{{dataType}}} value) {
+            for ({{enumName}} b : {{enumName}}.values()) {
+                if (java.util.Objects.equals(b.value, value)) {
+                    return b;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+    }
+    {{/isEnum}}
+    {{/vars}}
+
+{{> pojo}}
+}
+{{/isMapModel}}
+{{/isArrayModel}}
+{{/isEnum}}
+{{/model}}
+{{/models}}

@@ -1,0 +1,14 @@
+{{#allVars}}
+    @JsonProperty("{{baseName}}")
+    private {{{datatypeWithEnum}}} {{name}};
+{{/allVars}}
+{{^allVars}}
+    {{#parentVars}}
+        @JsonProperty("{{baseName}}")
+        private {{{datatypeWithEnum}}} {{name}};
+    {{/parentVars}}
+    {{#vars}}
+        @JsonProperty("{{baseName}}")
+        private {{{datatypeWithEnum}}} {{name}};
+    {{/vars}}
+{{/allVars}}

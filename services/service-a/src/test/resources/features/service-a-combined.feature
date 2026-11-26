@@ -13,7 +13,7 @@ Feature: Combined greeting from service-a
     Given service-b answers GET "/api/v1/hello" for name "Roman" with status 200
     When I send GET "/api/v1/combined?name=Roman" to service-a
     Then the response status is 200
-    And the response contains the "service-a" block
+    And the response contains the "service-a" block with "service" and "version"
     And the response contains the "service-b" block with "message" and "version"
 
   @ErrorCase @SC-002
@@ -46,6 +46,14 @@ Feature: Combined greeting from service-a
   @ErrorCase @SC-005
   Scenario: Service-b returns a server error and service-a does not retry
     Given service-b answers GET "/api/v1/hello" with status 500
+    When I send GET "/api/v1/combined?name=Roman" to service-a
+    Then service-a calls service-b exactly once
+    And the response status is 502
+    And the error code is "SERVICE_B_ERROR"
+
+  @ErrorCase @SC-020
+  Scenario: Service-b returns a client error and service-a does not retry
+    Given service-b answers GET "/api/v1/hello" with status 400
     When I send GET "/api/v1/combined?name=Roman" to service-a
     Then service-a calls service-b exactly once
     And the response status is 502

@@ -14,6 +14,7 @@ approvals:
 |  Version |   Date   | Change Description | Project/Feature | Author | Squad |
 |----------|----------|--------------------|-----------------|--------|-------|
 | 0.6 | 2026-11-25 | Spike evidence: image delivery High, ArgoCD pinned, AC coverage matrix added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
+| 0.8 | 2026-11-25 | Three gaps found while generating the shell, closed by the Developer: B 4xx answers map to 502 SERVICE_B_ERROR, a refused connection is classified as SERVICE_B_UNAVAILABLE in the shell, service-a block defined (`service`, `version`). Scenarios SC-001 updated and SC-020 added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.7 | 2026-11-25 | Retry rule defined (timeouts and connection errors only, never 4xx/5xx), timeout and retries made configuration, worst-case latency documented. Decided by the Developer while reviewing the Gherkin scenarios | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 
 ## Information Gaps
@@ -77,7 +78,7 @@ graph TD
 | Service | Endpoint | Success response |
 |---|---|---|
 | B | `GET /api/v1/hello?name={name}` | `200 {"message":"Hello, Roman","service":"service-b","version":"1.0.0"}` |
-| A | `GET /api/v1/combined?name={name}` | `200 {"name":"Roman","service-a":{...},"service-b":{...}}` |
+| A | `GET /api/v1/combined?name={name}` | `200 {"name":"Roman","service-a":{"service":"service-a","version":"1.0.0"},"service-b":{"message":"Hello, Roman","version":"1.0.0"}}` |
 
 Health endpoints are `/q/health/live` and `/q/health/ready`. The readiness of A does not depend on B.
 
@@ -104,7 +105,8 @@ Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_
 |--------------------------------|----------------------|--------------------|--------|
 | `service-b.message` | `message` | Pass-through | |
 | `service-b.version` | `version` | Pass-through | |
-| `service-a` | n/a | Added by A | A's own block |
+| `service-a.service` | n/a | Constant `service-a` | A's own block, mirrors the shape of B's greeting |
+| `service-a.version` | n/a | Application version of A (`info.app.version`) | A's own block |
 
 ## Error Management
 
@@ -112,6 +114,7 @@ Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_
 |------------------------|--------------------------|---------------------|------------------------|----------------------------|--------|
 | timeout or connection refused | 503 | Service Unavailable | n/a | `SERVICE_B_UNAVAILABLE` | B slow or scaled to 0 |
 | 5xx | 502 | Bad Gateway | n/a | `SERVICE_B_ERROR` | B failed |
+| 4xx | 502 | Bad Gateway | n/a | `SERVICE_B_ERROR` | Unexpected answer from B: A validates the name first, so a 4xx from B is a contract mismatch. Not retried |
 | n/a | 400 | Bad Request | n/a | `INVALID_REQUEST` | Missing or invalid `name` |
 
 **Example of an error payload**
