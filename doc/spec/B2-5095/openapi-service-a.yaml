@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: service-a
+  description: Caller service of B2-5095. Derived from doc/spec/B2-5095/spec.md v0.7.
+  version: 1.0.0
+paths:
+  /api/v1/combined:
+    get:
+      operationId: getCombined
+      summary: Combined result of service-a and service-b
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 50
+        - name: X-Transaction-Id
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Combined result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedResponse'
+        '400':
+          description: Missing or invalid name (INVALID_REQUEST)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRepresentation'
+        '502':
+          description: service-b returned a server error (SERVICE_B_ERROR)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRepresentation'
+        '503':
+          description: service-b slow or unreachable (SERVICE_B_UNAVAILABLE)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRepresentation'
+components:
+  schemas:
+    CombinedResponse:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: Roman
+        service-a:
+          type: object
+          description: service-a own block. Fields are not defined by the spec. [NEEDS VERIFICATION]
+          additionalProperties: true
+        service-b:
+          type: object
+          required: [message, version]
+          properties:
+            message:
+              type: string
+            version:
+              type: string
+    ErrorRepresentation:
+      type: object
+      required: [code, reason, '@type']
+      properties:
+        code:
+          type: string
+          enum: [INVALID_REQUEST, SERVICE_B_UNAVAILABLE, SERVICE_B_ERROR]
+        reason:
+          type: string
+        '@type':
+          type: string
+          example: ErrorRepresentation

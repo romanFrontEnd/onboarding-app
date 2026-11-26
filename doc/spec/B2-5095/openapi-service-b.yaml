@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: service-b
+  description: Callee service of B2-5095. Derived from doc/spec/B2-5095/spec.md v0.7.
+  version: 1.0.0
+paths:
+  /api/v1/hello:
+    get:
+      operationId: getHello
+      summary: Greeting for a name
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 50
+        - name: X-Transaction-Id
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Greeting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloResponse'
+        '400':
+          description: Missing or invalid name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRepresentation'
+components:
+  schemas:
+    HelloResponse:
+      type: object
+      required: [message, service, version]
+      properties:
+        message:
+          type: string
+          example: Hello, Roman
+        service:
+          type: string
+          example: service-b
+        version:
+          type: string
+          example: 1.0.0
+    ErrorRepresentation:
+      type: object
+      required: [code, reason, '@type']
+      properties:
+        code:
+          type: string
+        reason:
+          type: string
+        '@type':
+          type: string
+          example: ErrorRepresentation
