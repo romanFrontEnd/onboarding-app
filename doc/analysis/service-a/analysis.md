@@ -37,4 +37,4 @@ Called by a developer or test client after `make up`, through `kubectl port-forw
 2. Is correlation-ID tracing enough, or is OpenTelemetry wanted?
 
 ## Source
-- `doc/spec/B2-5095/spec.md` (v0.6, approved at the spec-approved gate by the Developer, Analyst approval pending)
+- `doc/spec/B2-5095/spec.md` (v0.6, approved at the spec-approved gate by the Developer, and by the Analyst, Roman Test, on 2026-11-25)

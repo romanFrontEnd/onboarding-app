@@ -19,6 +19,15 @@ kubectl apply -n argocd --server-side --force-conflicts \
   -f "https://raw.githubusercontent.com/argoproj/argo-cd/${ARGOCD_VERSION}/manifests/install.yaml"
 kubectl -n argocd rollout status deploy/argocd-server --timeout=300s
 
+# Private repository (AC10): credentials come from the environment, never from a file in Git.
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  kubectl -n argocd create secret generic repo-onboarding \
+    --from-literal=type=git --from-literal=url=https://github.com/romanFrontEnd/onboarding-app.git \
+    --from-literal=username=x-access-token --from-literal=password="$GITHUB_TOKEN" \
+    --dry-run=client -o yaml | kubectl apply -f -
+  kubectl -n argocd label secret repo-onboarding argocd.argoproj.io/secret-type=repository --overwrite
+fi
+
 # Images first: a tag pinned in Git must exist in the cluster before ArgoCD deploys it.
 for service in service-b service-a; do
   scripts/release.sh "$service" --load-only

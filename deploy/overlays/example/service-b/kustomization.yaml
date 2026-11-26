@@ -5,7 +5,7 @@ resources:
   - ../../../base/service-b
 images:
   - name: service-b
-    newTag: b5e3eda
+    newTag: 9c088b9
 patches:
   - target:
       kind: Deployment

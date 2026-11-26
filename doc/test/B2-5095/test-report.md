@@ -130,7 +130,7 @@ Classes still at 0% lines: service-a `CombinedException`, `CombinedExceptionHand
 - Finding 2 is an accepted risk until the Developer decides: about 90 lines of template infrastructure in each service have no behaviour to test.
 - `LoggingUtils` and the logging interceptors stay at low coverage (17% to 73%). They are Alfie's templates and the spec states no requirement on them.
 - SC-007 and SC-018 are proven only to the extent finding 3 describes.
-- The Analyst approval of the spec is still pending (Roman Test).
+- None outstanding on approvals: the Analyst (Roman Test) approved the spec on 2026-11-25.
 
 ## Run history
 
