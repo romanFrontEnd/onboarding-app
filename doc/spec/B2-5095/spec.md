@@ -14,6 +14,7 @@ approvals:
 |  Version |   Date   | Change Description | Project/Feature | Author | Squad |
 |----------|----------|--------------------|-----------------|--------|-------|
 | 0.6 | 2026-11-25 | Spike evidence: image delivery High, ArgoCD pinned, AC coverage matrix added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
+| 0.9 | 2026-11-25 | Retry backoff defined: fixed delay `SERVICE_B_RETRY_BACKOFF` (milliseconds, default 200) between attempts. Worst-case latency formula updated. Closed by the Developer after Teddy's RED run | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.8 | 2026-11-25 | Three gaps found while generating the shell, closed by the Developer: B 4xx answers map to 502 SERVICE_B_ERROR, a refused connection is classified as SERVICE_B_UNAVAILABLE in the shell, service-a block defined (`service`, `version`). Scenarios SC-001 updated and SC-020 added | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 | 0.7 | 2026-11-25 | Retry rule defined (timeouts and connection errors only, never 4xx/5xx), timeout and retries made configuration, worst-case latency documented. Decided by the Developer while reviewing the Gherkin scenarios | Onboarding 26-Pi3/Pi4 | Roman | n/a |
 
@@ -86,11 +87,11 @@ Health endpoints are `/q/health/live` and `/q/health/ready`. The readiness of A 
 
 1. A requires `name` (non-blank, at most 50 characters). Otherwise it returns 400 `INVALID_REQUEST`.
 2. A reads the B URL from the `SERVICE_B_URL` configuration.
-3. A calls B with a timeout of `SERVICE_B_TIMEOUT` (default 2s) and up to `SERVICE_B_RETRIES` retries (default 2) with backoff.
+3. A calls B with a timeout of `SERVICE_B_TIMEOUT` (default 2s) and up to `SERVICE_B_RETRIES` retries (default 2), waiting a fixed `SERVICE_B_RETRY_BACKOFF` (milliseconds, default 200) between attempts.
 4. A retries only on timeouts and connection errors. It never retries on a 4xx or 5xx answer from B.
 5. A builds the combined response.
 
-Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_TIMEOUT` plus backoff, about 6s plus backoff with the defaults.
+Worst-case response time when B is down: (`SERVICE_B_RETRIES` + 1) x `SERVICE_B_TIMEOUT` + `SERVICE_B_RETRIES` x `SERVICE_B_RETRY_BACKOFF`, about 6.4s with the defaults.
 
 ## Mapping and Transformation Rules
 

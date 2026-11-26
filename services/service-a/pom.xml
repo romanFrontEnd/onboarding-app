@@ -212,6 +212,13 @@
        		  <scope>test</scope>
     	</dependency>
 
+        <!-- Mockito integration for @InjectMock (test) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Database Dependencies -->
         <!-- Database dependencies - Uncomment when connecting to relational databases -->
         <!--

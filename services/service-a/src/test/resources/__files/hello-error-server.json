@@ -1,0 +1,5 @@
+{
+  "code": "INTERNAL_ERROR",
+  "reason": "service-b failed",
+  "@type": "ErrorRepresentation"
+}
